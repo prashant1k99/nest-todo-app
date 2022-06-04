@@ -1,6 +1,6 @@
 export interface Todo {
   id: number;
-  task: string;
+  title: string;
   dateAdded: Date;
   dateUpdated: Date;
   isCompleted: boolean;
@@ -8,7 +8,7 @@ export interface Todo {
 }
 
 export interface TodoCU {
-  task: string;
+  title: string;
   isCompleted: boolean;
   description?: string;
 }

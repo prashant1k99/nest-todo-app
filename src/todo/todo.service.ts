@@ -1,45 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { Todo, TodoCU } from './interfaces/todo.interface';
-import { generateId } from './todo.utility';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class TodoService {
-  private readonly todos: Todo[] = [];
-  private ids = generateId();
+  constructor(@InjectModel('Todo') private readonly todoModel: Model<Todo>) {}
 
   create(todo: TodoCU) {
-    const item = {
-      id: this.ids.next().value as number,
-      dateAdded: new Date(),
-      dateUpdated: new Date(),
-      ...todo,
-    };
-    this.todos.push(item);
-    return item;
+    const createdTodo = this.todoModel.create(todo);
+    return createdTodo;
   }
 
   findAll() {
-    return this.todos;
+    return this.todoModel.find();
   }
 
-  findOne(id: number) {
-    return this.todos.find((todo) => todo.id === id);
+  findOne(id: string) {
+    return this.todoModel.findById(id);
   }
 
-  update(id: number, updateTodo: TodoCU) {
-    const todoItemIndex = this.todos.findIndex((todo) => todo.id === id);
-    this.todos[todoItemIndex] = {
-      ...this.todos[todoItemIndex],
-      ...updateTodo,
-      dateUpdated: new Date(),
-    };
-
-    return this.todos[todoItemIndex];
+  update(id: string, updateTodo: TodoCU) {
+    return this.todoModel.findByIdAndUpdate(id, updateTodo, { new: true });
   }
 
-  remove(id: number) {
-    const todoItemIndex = this.todos.findIndex((todo) => todo.id === id);
-    this.todos.splice(todoItemIndex, 1);
-    return `This action removes a #${id} todo`;
+  remove(id: string) {
+    return this.todoModel.findByIdAndDelete(id);
   }
 }
